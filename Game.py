@@ -20,7 +20,7 @@ class MainWindow:
         self.screen = pygame.display.set_mode((1024, 768))
 
         self.clock = pygame.time.Clock()
-        self.delta = self.clock.tick(30)
+        self.delta = self.clock.tick(60)
         self.players = []
         self.running = 1
 
@@ -39,13 +39,13 @@ class MainWindow:
     def __adjust_input(player):
         def read_input(read):
             if read == 'A':
-                player.currX += 10
+                player.currX += 1
             elif read == 'B':
-                player.currX -= 10
+                player.currX -= 1
             elif read == 'X':
-                player.currY += 10
+                player.currY += 1
             elif read == 'Y':
-                player.currY -= 10
+                player.currY -= 1
         if type(player) is not Player:
             raise TypeError("Adjusting non-Player type")
         read = player.input.read()
@@ -63,8 +63,6 @@ def add_players(window):
         paths = Controller.return_microsoft_paths()
         for index in range(len(paths)):
             window.add_player(Player(index, Controller(paths[index])))
-            if index == 0:
-                break
     else:
         raise TypeError("Window is not of type MainWindow")
 
