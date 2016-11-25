@@ -4,15 +4,7 @@ from circle_game.Controller import Controller
 from circle_game.Player import Player
 import pygame
 import time
-
-# def main():
-#     print("Hello World")
-#     paths = Controller.return_microsoft_paths()
-#     player1_input = Controller(paths[0])
-#     player2_input = Controller(paths[1])
-#
-# if __name__ == '__main__':
-#     main()
+import _thread
 
 
 class MainWindow:
@@ -28,7 +20,9 @@ class MainWindow:
         while self.running:
             self.screen.fill((0, 0, 0))
             for player in self.players:
-                self.__adjust_input(player)
+                _thread.start_new_thread(self.__adjust_input, (player, ))
+                # create a thread for each player
+                # execute each thread separately, repeatedly instead of calling on new threads
                 self.screen.blit(player.image, (player.currX, player.currY))
             pygame.display.flip()
 
