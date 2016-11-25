@@ -1,55 +1,45 @@
 #!/usr/bin/env python3
 
 from circle_game.Controller import Controller
-from circle_game.Player import Player
+from circle_game.Player import Player, PlayerThread
 import pygame
-import time
-
-# def main():
-#     print("Hello World")
-#     paths = Controller.return_microsoft_paths()
-#     player1_input = Controller(paths[0])
-#     player2_input = Controller(paths[1])
-#
-# if __name__ == '__main__':
-#     main()
+import _thread
 
 
 class MainWindow:
     def __init__(self):
         self.screen = pygame.display.set_mode((1024, 1024))
-
+        self.screen.fill((0, 0, 0))
         self.clock = pygame.time.Clock()
         self.delta = self.clock.tick(60)
         self.players = []
-        self.running = 1
+        self.players_threads = []
+        self.running = True
 
     def start_game(self):
+        self.change_player_threads(True)
         while self.running:
-            self.screen.fill((0, 0, 0))
-            for player in self.players:
-                self.__adjust_input(player)
-                self.screen.blit(player.image, (player.currX, player.currY))
             pygame.display.flip()
+
+    def change_player_threads(self, on):
+        for player_thread in self.players_threads:
+            try:
+                if on:
+                    player_thread.start()
+                else:
+                    player_thread.stop()
+            except RuntimeError:
+                self.repopulate_player_threads()
+                self.change_player_threads(on)
 
     def add_player(self, player):
         self.players.append(player)
+        self.repopulate_player_threads()
 
-    @staticmethod
-    def __adjust_input(player):
-        def read_input(read):
-            if read == 'A':
-                player.currX += 1
-            elif read == 'B':
-                player.currX -= 1
-            elif read == 'X':
-                player.currY += 1
-            elif read == 'Y':
-                player.currY -= 1
-        if type(player) is not Player:
-            raise TypeError("Adjusting non-Player type")
-        read = player.input.read()
-        read_input(read)
+    def repopulate_player_threads(self):
+        del self.players_threads[:]
+        for player in self.players:
+            self.players_threads.append(PlayerThread(player, player.player_num, self.screen))
 
 
 def initialize_game():
