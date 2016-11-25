@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-import pygame
-from circle_game.Controller import Controller
+import _thread
 import threading
+
+import pygame
+
+from circle_game.Controller import Controller
+
+STANDARD_MOVEMENT = 1
 
 
 class Player:
-
     def __init__(self, player_num, input_method):
         """
         :param input_method: Controller
@@ -35,30 +39,53 @@ class PlayerThread(threading.Thread):
         self.name = name
         self.screen = screen
         self.running = True
+        self.moving = True
+        self.moving_thread = None
 
     def run(self):
+        self.moving_thread = MovementThread(['', ''], self.player, self.screen)
+        self.moving_thread.start()
         while self.running:
-            self.__adjust_input(self.screen, self.player)
-        print("Exiting out of --> " + str(self.name))
+            self.__adjust_input()
 
     def stop(self):
         self.running = False
+        self.moving_thread.stop()
+        self.moving_thread = None
 
-    @staticmethod
-    def __adjust_input(screen, player):
-        def read_input(read):
-            print("Player " + player.player_num + " --> " + str(read))
-            if read == 'A':
-                player.currX += 1
-            elif read == 'B':
-                player.currX -= 1
-            elif read == 'X':
-                player.currY += 1
-            elif read == 'Y':
-                player.currY -= 1
+    def __adjust_input(self):
+        controller_read = self.player.input.read()
+        self.moving_thread.update_movement(controller_read['thumpad'])
 
-        if type(player) is not Player:
-            raise TypeError("Adjusting non-Player type")
-        read = player.input.read()
-        read_input(read)
-        screen.blit(player.image, (player.currX, player.currY))
+
+class MovementThread(threading.Thread):
+
+    def __init__(self, movement, player, screen):
+        threading.Thread.__init__(self)
+        self.movement = movement
+        self.player = player
+        self.screen = screen
+        self.moving = True
+        self.running = False
+
+    def is_running(self):
+        return self.running
+
+    def run(self):
+        self.running = True
+        while self.moving:
+            self.__adjust_player_position()
+
+    def __adjust_player_position(self):
+        values = {'E': STANDARD_MOVEMENT, 'W': -STANDARD_MOVEMENT,
+                  'N': -STANDARD_MOVEMENT, 'S': STANDARD_MOVEMENT,
+                  '': 0}
+        self.player.currX += values[self.movement[0]]
+        self.player.currY += values[self.movement[1]]
+        self.screen.blit(self.player.image, (self.player.currX, self.player.currY))
+
+    def update_movement(self, movement):
+        self.movement = movement
+
+    def stop(self):
+        self.moving = False
