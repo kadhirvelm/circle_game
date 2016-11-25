@@ -16,7 +16,7 @@ class Player:
         self.player_num = player_num
         self.image = pygame.image.load(self.player_dict(player_num))
         self.input = input_method  # type: Controller
-        self.currX = 100 * player_num
+        self.currX = 400 * player_num
         self.currY = 100 * player_num
         self.latest_press = None
 
@@ -47,6 +47,7 @@ class PlayerThread(threading.Thread):
     @staticmethod
     def __adjust_input(screen, player):
         def read_input(read):
+            print("Player " + player.player_num + " --> " + str(read))
             if read == 'A':
                 player.currX += 1
             elif read == 'B':

@@ -3,7 +3,6 @@
 from circle_game.Controller import Controller
 from circle_game.Player import Player, PlayerThread
 import pygame
-import _thread
 
 
 class MainWindow:
@@ -40,6 +39,7 @@ class MainWindow:
         del self.players_threads[:]
         for player in self.players:
             self.players_threads.append(PlayerThread(player, player.player_num, self.screen))
+            self.screen.blit(player.image, (player.currX, player.currY))
 
 
 def initialize_game():
