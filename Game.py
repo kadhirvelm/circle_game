@@ -17,7 +17,7 @@ import time
 
 class MainWindow:
     def __init__(self):
-        self.screen = pygame.display.set_mode((1024, 768))
+        self.screen = pygame.display.set_mode((1024, 1024))
 
         self.clock = pygame.time.Clock()
         self.delta = self.clock.tick(60)
