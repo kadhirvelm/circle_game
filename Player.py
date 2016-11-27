@@ -1,29 +1,32 @@
 #!/usr/bin/env python3
-import threading, pygame
+import threading
+import pygame
 
 from circle_game.Controller import Controller
 
 
-class Player:
+class Player(pygame.sprite.Sprite):
     def __init__(self, player_num, input_method):
-        """
-        :param input_method: Controller
-        """
+        pygame.sprite.Sprite.__init__(self)
         if type(input_method) is not Controller:
             raise TypeError("Input method for player is not of type controller")
-
         self.player_num = player_num
         self.image = pygame.image.load(self.player_dict(player_num))
         self.input = input_method  # type: Controller
-        self.position = {'x': 400 * player_num, 'y': 100* player_num}
+        self.position = {'x': 400 * player_num, 'y': 100 * player_num}
         self.latest_press = None
         self.standard_movement = 3
+        self.rect = self.image.get_rect()
 
     def sprint(self, on):
         if on:
             self.standard_movement = 6
         else:
             self.standard_movement = 3
+
+    def update_rect(self):
+        self.rect = self.rect.move(self.position['x'], self.position['y'])
+        self.rect.center = (self.position['x'], self.position['y'])
 
     @staticmethod
     def player_dict(num):

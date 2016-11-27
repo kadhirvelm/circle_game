@@ -10,14 +10,16 @@ PLAYER_SIZE = 300
 
 class MainGameFrame:
     def __init__(self):
-        self.screen = pygame.display.set_mode((1024, 1024))
+        self.screen = pygame.display.set_mode((1024, 2024))
         self.screen.fill((0, 0, 0))
         self.clock = pygame.time.Clock()
         self.FRAMES_PER_SECOND = 60
         self.players = []
+        self.rendered_players = []
         self.players_threads = []
         self.running = True
         self.WINDOW_DIMENSION = {'x': 1000, 'y': 1000}
+        self.background = pygame.image.load('images/field.png')
 
     def start_game(self):
         self.change_player_threads(True)
@@ -41,13 +43,13 @@ class MainGameFrame:
 
     def add_player(self, player):
         self.players.append(player)
+        self.rendered_players.append(pygame.sprite.RenderPlain(player))
         self.repopulate_player_threads()
 
     def repopulate_player_threads(self):
         del self.players_threads[:]
         for player in self.players:
             self.players_threads.append(PlayerThread(player, player.player_num, self))
-            self.screen.blit(player.image, (player.position['x'], player.position['y']))
 
     def check_field(self, new_position, axis):
         if -250 < new_position < self.WINDOW_DIMENSION[axis]:
