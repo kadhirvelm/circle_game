@@ -9,6 +9,7 @@ WINDOW_HEIGHT = 1000
 FRAMES_PER_SECOND = 200
 MARGINS = 50
 
+
 class MainGameFrame:
     def __init__(self):
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -26,8 +27,8 @@ class MainGameFrame:
         while self.running:
             self.clock.tick(FRAMES_PER_SECOND)
             self.screen.fill((0, 0, 0))
-            for player in self.players:
-                self.screen.blit(player.image, (player.rect.x, player.rect.y))
+            for player in self.rendered_players:
+                player.draw(self.screen)
             pygame.display.flip()
 
     def change_player_threads(self, on):
@@ -52,8 +53,8 @@ class MainGameFrame:
             self.players_threads.append(PlayerThread(player, player.player_num, self))
 
     def movement_allowed(self, player_num, pos_dirs):
-        new_rect = this.players[player_num].rect.move(pos_dirs[0], pos_dirs[1])
-        return check_in_field(new_rect) and check_player_collide(player_num, new_rect)
+        new_rect = self.players[player_num].rect.move(pos_dirs[0], pos_dirs[1])
+        return self.check_in_field(new_rect) and self.check_player_collide(player_num, new_rect)
 
     def check_in_field(self, new_rect):
         return self.screen.get_rect().contains(new_rect)
