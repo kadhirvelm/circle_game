@@ -20,7 +20,6 @@ class MainGameFrame:
         self.running = True
         self.background = pygame.image.load('images/field.png')
         self.player_size = (pygame.image.load('images/player1_1.png')).get_rect()
-        self.center_field = self.screen.get_rect()
 
     def start_game(self):
         self.change_player_threads(True)
@@ -45,12 +44,14 @@ class MainGameFrame:
 
     def add_player(self, player):
         self.players.append(player)
-        self.repopulate_player_threads()
+        if player is ControllerPlayer:
+            self.repopulate_player_threads()
 
     def repopulate_player_threads(self):
         del self.players_threads[:]
         for player in self.players:
-            self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
+            if player is ControllerPlayer:
+                self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
 
     def movement_allowed(self, player_num, pos_dirs):
         """ Returns true if movement is allowed. """
@@ -58,9 +59,6 @@ class MainGameFrame:
         return self.check_in_field(new_rect) and self.check_player_collide(player_num, new_rect)
 
     def check_in_field(self, new_rect):
-        print(self.center_field)
-        if self.center_field.colliderect(new_rect):
-            return True
         return self.screen.get_rect().contains(new_rect)
 
     def check_player_collide(self, player_num, new_rect):
