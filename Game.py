@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-from circle_game.Controller import Controller
-from circle_game.ControllerPlayer import ControllerPlayer, ControllerPlayerThread
 import pygame
+from circle_game.Controller import Controller
+from circle_game.Keyboard import Keyboard
+from circle_game.ControllerPlayer import ControllerPlayer, ControllerPlayerThread
+from circle_game.KeyboardPlayer import KeyboardPlayer
 
 WINDOW_WIDTH = 1500
 WINDOW_HEIGHT = 1000
@@ -78,9 +80,10 @@ def initialize_game():
 
 def add_players(window):
     if type(window) is MainGameFrame:
+        window.add_player(KeyboardPlayer(0));
         paths = Controller.return_microsoft_paths()
         for index in range(len(paths)):
-            window.add_player(ControllerPlayer(index, Controller(paths[index])))
+            window.add_player(ControllerPlayer(index + 1, Controller(paths[index])))
     else:
         raise TypeError("Window is not of type MainWindow")
 
