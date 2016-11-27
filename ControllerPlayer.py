@@ -16,7 +16,7 @@ ACCELERATE_FACTOR = 1.1
 BRAKE_FACTOR = 1.2
 
 
-class Player(pygame.sprite.Sprite):
+class ControllerPlayer(pygame.sprite.Sprite):
     def __init__(self, player_num, input_method):
         pygame.sprite.Sprite.__init__(self)
         if type(input_method) is not Controller:
@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
                 3: 'images/player2_2.png'}[num]
 
 
-class PlayerThread(threading.Thread):
+class ControllerPlayerThread(threading.Thread):
     def __init__(self, player, name, main_game_frame):
         threading.Thread.__init__(self)
         self.player = player
@@ -61,7 +61,7 @@ class PlayerThread(threading.Thread):
         self.moving_thread = None
 
     def run(self):
-        self.moving_thread = MovementThread(['', ''], self.player, self.game_frame)
+        self.moving_thread = ControllerMovementThread(['', ''], self.player, self.game_frame)
         self.moving_thread.start()
         while self.running:
             self.__adjust_input()
@@ -83,7 +83,7 @@ class PlayerThread(threading.Thread):
             self.player.sprint(False)
 
 
-class MovementThread(threading.Thread):
+class ControllerMovementThread(threading.Thread):
     def __init__(self, movement, player, game_frame):
         threading.Thread.__init__(self)
         self.movement = movement

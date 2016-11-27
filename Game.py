@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from circle_game.Controller import Controller
-from circle_game.Player import Player, PlayerThread
+from circle_game.ControllerPlayer import ControllerPlayer, ControllerPlayerThread
 import pygame
 
 WINDOW_WIDTH = 1500
@@ -50,7 +50,7 @@ class MainGameFrame:
     def repopulate_player_threads(self):
         del self.players_threads[:]
         for player in self.players:
-            self.players_threads.append(PlayerThread(player, player.player_num, self))
+            self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
 
     def movement_allowed(self, player_num, pos_dirs):
         new_rect = self.players[player_num].rect.move(pos_dirs[0], pos_dirs[1])
@@ -78,7 +78,7 @@ def add_players(window):
     if type(window) is MainGameFrame:
         paths = Controller.return_microsoft_paths()
         for index in range(len(paths)):
-            window.add_player(Player(index, Controller(paths[index])))
+            window.add_player(ControllerPlayer(index, Controller(paths[index])))
     else:
         raise TypeError("Window is not of type MainWindow")
 
