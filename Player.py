@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import threading
 import pygame
-import math
 
 from circle_game.Controller import Controller
 
@@ -15,6 +14,7 @@ MIN_MOVEMENT = .004
 MAX_MOVEMENT = .01
 ACCELERATE_FACTOR = 1.1
 BRAKE_FACTOR = 1.2
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, player_num, input_method):
@@ -105,7 +105,7 @@ class MovementThread(threading.Thread):
         x_dir = MOVE_DIRECTIONS[self.movement[0]]
         y_dir = MOVE_DIRECTIONS[self.movement[1]]
 
-        if self.game_frame.check_player(self.player.player_num, [x_dir, y_dir]):
+        if self.game_frame.movement_allowed(self.player.player_num, [x_dir, y_dir]):
             delta_x = x_dir * standard_movement
             delta_y = y_dir * standard_movement
             self.player.update_rect(delta_x, delta_y)
