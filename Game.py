@@ -16,19 +16,20 @@ class MainGameFrame:
         self.screen.fill((0, 0, 0))
         self.clock = pygame.time.Clock()
         self.players = []
-        self.rendered_players = []
         self.players_threads = []
         self.running = True
         self.background = pygame.image.load('images/field.png')
         self.player_size = (pygame.image.load('images/player1_1.png')).get_rect()
+        self.center_field = self.screen.get_rect()
 
     def start_game(self):
         self.change_player_threads(True)
+        rendered_players = pygame.sprite.RenderPlain(*self.players)
+        self.screen.blit(self.background, (0, 0))
         while self.running:
             self.clock.tick(FRAMES_PER_SECOND)
-            self.screen.fill((0, 0, 0))
-            for player in self.rendered_players:
-                player.draw(self.screen)
+            rendered_players.clear(self.screen, self.background)
+            rendered_players.draw(self.screen)
             pygame.display.flip()
 
     def change_player_threads(self, on):
@@ -44,7 +45,6 @@ class MainGameFrame:
 
     def add_player(self, player):
         self.players.append(player)
-        self.rendered_players.append(pygame.sprite.RenderPlain(player))
         self.repopulate_player_threads()
 
     def repopulate_player_threads(self):
@@ -53,10 +53,14 @@ class MainGameFrame:
             self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
 
     def movement_allowed(self, player_num, pos_dirs):
+        """ Returns true if movement is allowed. """
         new_rect = self.players[player_num].rect.move(pos_dirs[0], pos_dirs[1])
         return self.check_in_field(new_rect) and self.check_player_collide(player_num, new_rect)
 
     def check_in_field(self, new_rect):
+        print(self.center_field)
+        if self.center_field.colliderect(new_rect):
+            return True
         return self.screen.get_rect().contains(new_rect)
 
     def check_player_collide(self, player_num, new_rect):
