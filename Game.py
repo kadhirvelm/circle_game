@@ -24,7 +24,6 @@ class MainGameFrame:
 
     def start_game(self):
         self.change_player_threads(True)
-        self.screen.blit(self.background, (0, 0))
         while self.running:
             self.clock.tick(FRAMES_PER_SECOND)
             self.screen.fill((0, 0, 0))
