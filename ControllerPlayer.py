@@ -29,6 +29,8 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.position = {'x': 0.0, 'y': 0.0}
         self.rect = self.image.get_rect()
         self.update_rect(100 * player_num, 100 * player_num)
+        self.has_disk = False
+        self.throwing_disk = False
 
     def sprint(self, on):
         if on:
@@ -51,17 +53,17 @@ class ControllerPlayer(pygame.sprite.Sprite):
 
 
 class ControllerPlayerThread(threading.Thread):
-    def __init__(self, player, name, main_game_frame):
+    def __init__(self, player, name, main_game):
         threading.Thread.__init__(self)
         self.player = player
         self.name = name
-        self.game_frame = main_game_frame
+        self.game = main_game
         self.running = True
         self.moving = True
         self.moving_thread = None
 
     def run(self):
-        self.moving_thread = ControllerMovementThread(['', ''], self.player, self.game_frame)
+        self.moving_thread = ControllerMovementThread(['', ''], self.player, self.game)
         self.moving_thread.start()
         while self.running:
             self.__adjust_input()
@@ -82,13 +84,35 @@ class ControllerPlayerThread(threading.Thread):
         else:
             self.player.sprint(False)
 
+        if 'B' in button_reads:
+            self.deal_with_disk()
+
+        if self.player.has_disk:
+            if 'RT' in button_reads:
+                self.player.has_disk = False
+                self.player.throwing_disk = True
+                self.game.disk.throw_center()
+            elif 'X' in button_reads:
+                self.game.disk.switch_hands('Left')
+            elif 'Y' in button_reads:
+                self.game.disk.switch_hands('Right')
+
+    def deal_with_disk(self):
+        if not self.player.has_disk:
+            if self.game.disk.collides_with_rect(self.player.rect):
+                self.player.has_disk = True
+                self.game.disk.claim_disk(self.player)
+        else:
+            self.player.has_disk = False
+            self.game.disk.drop_disk()
+
 
 class ControllerMovementThread(threading.Thread):
-    def __init__(self, movement, player, game_frame):
+    def __init__(self, movement, player, game):
         threading.Thread.__init__(self)
         self.movement = movement
         self.player = player
-        self.game_frame = game_frame
+        self.game = game
         self.moving = True
         self.running = False
 
@@ -105,10 +129,14 @@ class ControllerMovementThread(threading.Thread):
         x_dir = MOVE_DIRECTIONS[self.movement[0]]
         y_dir = MOVE_DIRECTIONS[self.movement[1]]
 
-        if self.game_frame.movement_allowed(self.player.player_num, [x_dir, y_dir]):
+        if self.game.movement_allowed(self.player.player_num, [x_dir, y_dir]):
             delta_x = x_dir * standard_movement
             delta_y = y_dir * standard_movement
             self.player.update_rect(delta_x, delta_y)
+            if self.player.has_disk:
+                self.game.disk.update_rect()
+        if self.player.throwing_disk:
+            self.game.disk.update_movement(self.game.disk.throwing['x'], self.game.disk.throwing['y'])
 
     def update_movement(self, movement):
         self.movement = movement
