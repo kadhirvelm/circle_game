@@ -28,8 +28,8 @@ class MainGameFrame:
         while self.running:
             self.clock.tick(FRAMES_PER_SECOND)
             self.screen.fill((0, 0, 0))
-            for player in self.players:
-                self.screen.blit(player.image, (player.rect.x, player.rect.y))
+            for player in self.rendered_players:
+                player.draw(self.screen)
             pygame.display.flip()
 
     def change_player_threads(self, on):
