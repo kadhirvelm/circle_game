@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import pygame
+import math
 from circle_game.Controller import Controller
-from circle_game.Keyboard import Keyboard
 from circle_game.ControllerPlayer import ControllerPlayer, ControllerPlayerThread
 from circle_game.KeyboardPlayer import KeyboardPlayer
 
@@ -22,6 +22,7 @@ class MainGameFrame:
         self.running = True
         self.background = pygame.image.load('images/field.png')
         self.player_size = (pygame.image.load('images/player1_1.png')).get_rect()
+        self.center_field = {'x': WINDOW_WIDTH / 2, 'y': WINDOW_HEIGHT / 2}
 
     def start_game(self):
         self.change_player_threads(True)
@@ -46,13 +47,13 @@ class MainGameFrame:
 
     def add_player(self, player):
         self.players.append(player)
-        if player is ControllerPlayer:
+        if type(player) is ControllerPlayer:
             self.repopulate_player_threads()
 
     def repopulate_player_threads(self):
         del self.players_threads[:]
         for player in self.players:
-            if player is ControllerPlayer:
+            if type(player) is ControllerPlayer:
                 self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
 
     def movement_allowed(self, player_num, pos_dirs):
@@ -61,6 +62,8 @@ class MainGameFrame:
         return self.check_in_field(new_rect) and self.check_player_collide(player_num, new_rect)
 
     def check_in_field(self, new_rect):
+        if math.hypot(new_rect.center[0] - self.center_field['x'], new_rect.center[1] - self.center_field['y']) <= 125:
+            return False
         return self.screen.get_rect().contains(new_rect)
 
     def check_player_collide(self, player_num, new_rect):
@@ -80,10 +83,10 @@ def initialize_game():
 
 def add_players(window):
     if type(window) is MainGameFrame:
-        window.add_player(KeyboardPlayer(0));
+        # window.add_player(KeyboardPlayer(0))
         paths = Controller.return_microsoft_paths()
         for index in range(len(paths)):
-            window.add_player(ControllerPlayer(index + 1, Controller(paths[index])))
+            window.add_player(ControllerPlayer(index, Controller(paths[index])))
     else:
         raise TypeError("Window is not of type MainWindow")
 
