@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import threading
 import pygame
+import math
 
 from circle_game.Controller import Controller
 
@@ -13,20 +14,23 @@ class Player(pygame.sprite.Sprite):
         self.player_num = player_num
         self.image = pygame.image.load(self.player_dict(player_num))
         self.input = input_method  # type: Controller
-        self.position = {'x': 400 * player_num, 'y': 100 * player_num}
         self.latest_press = None
-        self.standard_movement = 3
+        self.standard_movement = .004
+        self.position = {'x': 0.0, 'y': 0.0}
         self.rect = self.image.get_rect()
+        self.update_rect(100 * player_num, 100 * player_num)
 
     def sprint(self, on):
         if on:
-            self.standard_movement = 6
+            self.standard_movement = .01 if self.standard_movement >= .01 else self.standard_movement * 1.1
         else:
-            self.standard_movement = 3
+            self.standard_movement = .004 if self.standard_movement <= .004 else self.standard_movement / 1.2
 
-    def update_rect(self):
-        self.rect = self.rect.move(self.position['x'], self.position['y'])
-        self.rect.center = (self.position['x'], self.position['y'])
+    def update_rect(self, delta_x, delta_y):
+        self.position['x'] += delta_x
+        self.position['y'] += delta_y
+        self.rect.x = self.position['x']
+        self.rect.y = self.position['y']
 
     @staticmethod
     def player_dict(num):
@@ -91,15 +95,11 @@ class MovementThread(threading.Thread):
         values = {'E': standard_movement, 'W': -standard_movement,
                   'N': -standard_movement, 'S': standard_movement,
                   '': 0}
-        temp_x = self.player.position['x'] + values[self.movement[0]]
-        temp_y = self.player.position['y'] + values[self.movement[1]]
-        if self.game_frame.check_player(self.player.player_num, temp_x, temp_y):
-            if self.game_frame.check_field(temp_x, 'x'):
-                self.player.position['x'] = temp_x
-            if self.game_frame.check_field(temp_y, 'y'):
-                self.player.position['y'] = temp_y
-        self.game_frame.screen.blit(self.player.image,
-                                    (self.player.position['x'], self.player.position['y']))
+
+        temp_rect = self.player.rect.move(values[self.movement[0]] / standard_movement,
+                                          values[self.movement[1]] / standard_movement)
+        if self.game_frame.check_player(self.player.player_num, temp_rect):
+            self.player.update_rect(values[self.movement[0]], values[self.movement[1]])
 
     def update_movement(self, movement):
         self.movement = movement

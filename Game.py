@@ -3,9 +3,6 @@
 from circle_game.Controller import Controller
 from circle_game.Player import Player, PlayerThread
 import pygame
-import math
-
-PLAYER_SIZE = 300
 
 
 class MainGameFrame:
@@ -13,13 +10,14 @@ class MainGameFrame:
         self.screen = pygame.display.set_mode((1024, 2024))
         self.screen.fill((0, 0, 0))
         self.clock = pygame.time.Clock()
-        self.FRAMES_PER_SECOND = 60
+        self.FRAMES_PER_SECOND = 200
         self.players = []
         self.rendered_players = []
         self.players_threads = []
         self.running = True
         self.WINDOW_DIMENSION = {'x': 1000, 'y': 1000}
         self.background = pygame.image.load('images/field.png')
+        self.player_size = (pygame.image.load('images/player1_1.png')).get_rect()
 
     def start_game(self):
         self.change_player_threads(True)
@@ -27,7 +25,7 @@ class MainGameFrame:
             self.clock.tick(self.FRAMES_PER_SECOND)
             self.screen.fill((0, 0, 0))
             for player in self.players:
-                self.screen.blit(player.image, (player.position['x'], player.position['y']))
+                self.screen.blit(player.image, (player.rect.x, player.rect.y))
             pygame.display.flip()
 
     def change_player_threads(self, on):
@@ -52,17 +50,15 @@ class MainGameFrame:
             self.players_threads.append(PlayerThread(player, player.player_num, self))
 
     def check_field(self, new_position, axis):
-        if -250 < new_position < self.WINDOW_DIMENSION[axis]:
+        if -45 < new_position < (self.WINDOW_DIMENSION[axis] - 15):
             return True
         return False
 
-    def check_player(self, player_num, new_position_x, new_position_y):
+    def check_player(self, player_num, new_rect):
         for player in self.players:
             if player.player_num == player_num:
                 continue
-            delta_x = math.fabs(player.position['x'] - new_position_x)
-            delta_y = math.fabs(player.position['y'] - new_position_y)
-            if (delta_x <= PLAYER_SIZE) & (delta_y <= PLAYER_SIZE):
+            if player.rect.colliderect(new_rect):
                 return False
         return True
 
