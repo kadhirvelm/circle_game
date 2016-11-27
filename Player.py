@@ -5,6 +5,16 @@ import math
 
 from circle_game.Controller import Controller
 
+MINMAX_MOVEMENT_FACTOR = 4
+MOVE_DIRECTIONS = {'E': 1, 'W': -1,
+                'N': -1, 'S': 1,
+                '': 0}
+
+
+MIN_MOVEMENT = .004
+MAX_MOVEMENT = .01
+ACCELERATE_FACTOR = 1.1
+BRAKE_FACTOR = 1.2
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, player_num, input_method):
@@ -15,16 +25,16 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load(self.player_dict(player_num))
         self.input = input_method  # type: Controller
         self.latest_press = None
-        self.standard_movement = .004
+        self.standard_movement = MIN_MOVEMENT
         self.position = {'x': 0.0, 'y': 0.0}
         self.rect = self.image.get_rect()
         self.update_rect(100 * player_num, 100 * player_num)
 
     def sprint(self, on):
         if on:
-            self.standard_movement = .01 if self.standard_movement >= .01 else self.standard_movement * 1.1
+            self.standard_movement = MAX_MOVEMENT if self.standard_movement >= MAX_MOVEMENT else self.standard_movement * ACCELERATE_FACTOR
         else:
-            self.standard_movement = .004 if self.standard_movement <= .004 else self.standard_movement / 1.2
+            self.standard_movement = MIN_MOVEMENT if self.standard_movement <= MIN_MOVEMENT else self.standard_movement / BRAKE_FACTOR
 
     def update_rect(self, delta_x, delta_y):
         self.position['x'] += delta_x
@@ -92,14 +102,13 @@ class MovementThread(threading.Thread):
 
     def __adjust_player_position(self):
         standard_movement = self.player.standard_movement
-        values = {'E': standard_movement, 'W': -standard_movement,
-                  'N': -standard_movement, 'S': standard_movement,
-                  '': 0}
+        x_dir = MOVE_DIRECTIONS[self.movement[0]]
+        y_dir = MOVE_DIRECTIONS[self.movement[1]]
 
-        temp_rect = self.player.rect.move(values[self.movement[0]] / standard_movement,
-                                          values[self.movement[1]] / standard_movement)
-        if self.game_frame.check_player(self.player.player_num, temp_rect):
-            self.player.update_rect(values[self.movement[0]], values[self.movement[1]])
+        if self.game_frame.check_player(self.player.player_num, [x_dir, y_dir]):
+            delta_x = x_dir * standard_movement
+            delta_y = y_dir * standard_movement
+            self.player.update_rect(delta_x, delta_y)
 
     def update_movement(self, movement):
         self.movement = movement

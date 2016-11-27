@@ -4,25 +4,27 @@ from circle_game.Controller import Controller
 from circle_game.Player import Player, PlayerThread
 import pygame
 
+WINDOW_WIDTH = 1500
+WINDOW_HEIGHT = 1000
+FRAMES_PER_SECOND = 200
+MARGINS = 50
 
 class MainGameFrame:
     def __init__(self):
-        self.screen = pygame.display.set_mode((1024, 2024))
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen.fill((0, 0, 0))
         self.clock = pygame.time.Clock()
-        self.FRAMES_PER_SECOND = 200
         self.players = []
         self.rendered_players = []
         self.players_threads = []
         self.running = True
-        self.WINDOW_DIMENSION = {'x': 1000, 'y': 1000}
         self.background = pygame.image.load('images/field.png')
         self.player_size = (pygame.image.load('images/player1_1.png')).get_rect()
 
     def start_game(self):
         self.change_player_threads(True)
         while self.running:
-            self.clock.tick(self.FRAMES_PER_SECOND)
+            self.clock.tick(FRAMES_PER_SECOND)
             self.screen.fill((0, 0, 0))
             for player in self.players:
                 self.screen.blit(player.image, (player.rect.x, player.rect.y))
@@ -49,12 +51,14 @@ class MainGameFrame:
         for player in self.players:
             self.players_threads.append(PlayerThread(player, player.player_num, self))
 
-    def check_field(self, new_position, axis):
-        if -45 < new_position < (self.WINDOW_DIMENSION[axis] - 15):
-            return True
-        return False
+    def movement_allowed(self, player_num, pos_dirs):
+        new_rect = this.players[player_num].rect.move(pos_dirs[0], pos_dirs[1])
+        return check_in_field(new_rect) and check_player_collide(player_num, new_rect)
 
-    def check_player(self, player_num, new_rect):
+    def check_in_field(self, new_rect):
+        return self.screen.get_rect().contains(new_rect)
+
+    def check_player_collide(self, player_num, new_rect):
         for player in self.players:
             if player.player_num == player_num:
                 continue
