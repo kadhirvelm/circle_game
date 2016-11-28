@@ -3,7 +3,7 @@ import threading
 import pygame
 import math
 
-from circle_game.Keyboard import Keyboard
+from Keyboard import Keyboard
 
 MINMAX_MOVEMENT_FACTOR = 4
 MOVE_DIRECTIONS = {'E': 1, 'W': -1,

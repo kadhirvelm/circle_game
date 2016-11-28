@@ -2,7 +2,7 @@
 import threading
 import pygame
 
-from circle_game.Controller import Controller
+from Controller import Controller
 
 MINMAX_MOVEMENT_FACTOR = 4
 MOVE_DIRECTIONS = {'E': 1, 'W': -1,

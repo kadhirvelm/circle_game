@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import pygame
-from circle_game.Game import MainGame
+from Game import MainGame
 
-WINDOW_WIDTH = 1500
-WINDOW_HEIGHT = 1000
+WINDOW_WIDTH = 1000
+WINDOW_HEIGHT = 900
 FRAMES_PER_SECOND = 60
 MARGINS = 50
 

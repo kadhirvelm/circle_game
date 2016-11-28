@@ -2,9 +2,9 @@
 
 import pygame
 import math
-from circle_game.Controller import Controller
-from circle_game.ControllerPlayer import ControllerPlayer, ControllerPlayerThread
-from circle_game.Disk import Disk
+from Controller import Controller
+from ControllerPlayer import ControllerPlayer, ControllerPlayerThread
+from Disk import Disk
 
 WINDOW_WIDTH = 1500
 WINDOW_HEIGHT = 1000
