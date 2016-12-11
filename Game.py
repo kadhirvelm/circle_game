@@ -4,6 +4,7 @@ import pygame
 import math
 from Controller import Controller
 from ControllerPlayer import ControllerPlayer, ControllerPlayerThread
+from KeyboardPlayer import KeyboardPlayer
 from Disk import Disk
 
 WINDOW_WIDTH = 1500
@@ -33,10 +34,10 @@ class MainGame:
         self.game_objects = pygame.sprite.RenderPlain(*all_game_objects)
 
     def add_players(self):
-        # window.add_player(KeyboardPlayer(0))
+        self.players.append(KeyboardPlayer(0))
         paths = Controller.return_microsoft_paths()
-        for index in range(len(paths)):
-            self.players.append(ControllerPlayer(index, Controller(paths[index])))
+        # for index in range(len(paths)):
+        #     self.players.append(ControllerPlayer(index + 1, Controller(paths[index])))
 
     def repopulate_player_threads(self):
         del self.players_threads[:]
@@ -45,6 +46,8 @@ class MainGame:
                 self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
 
     def change_player_threads(self, on):
+        if on:
+            self.players[0].read()
         for player_thread in self.players_threads:
             try:
                 if on:
