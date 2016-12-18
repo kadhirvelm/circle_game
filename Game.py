@@ -33,9 +33,14 @@ class MainGame:
         all_game_objects.append(self.disk)
         self.game_objects = pygame.sprite.RenderPlain(*all_game_objects)
 
+    def draw_board(self, screen, background):
+        self.players[0].read()
+        self.game_objects.clear(screen, background)
+        self.game_objects.draw(screen)
+
     def add_players(self):
-        self.players.append(KeyboardPlayer(0))
-        paths = Controller.return_microsoft_paths()
+        self.players.append(KeyboardPlayer(0, self))
+        # paths = Controller.return_microsoft_paths()
         # for index in range(len(paths)):
         #     self.players.append(ControllerPlayer(index + 1, Controller(paths[index])))
 
@@ -46,8 +51,6 @@ class MainGame:
                 self.players_threads.append(ControllerPlayerThread(player, player.player_num, self))
 
     def change_player_threads(self, on):
-        if on:
-            self.players[0].read()
         for player_thread in self.players_threads:
             try:
                 if on:

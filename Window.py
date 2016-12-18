@@ -4,7 +4,7 @@ import pygame
 from Game import MainGame
 
 WINDOW_WIDTH = 1000
-WINDOW_HEIGHT = 900
+WINDOW_HEIGHT = 667
 FRAMES_PER_SECOND = 60
 MARGINS = 50
 
@@ -25,8 +25,7 @@ class MainGameFrame:
         self.update_score()
         while self.running:
             self.clock.tick(FRAMES_PER_SECOND)
-            self.game.game_objects.clear(self.screen, self.background)
-            self.game.game_objects.draw(self.screen)
+            self.game.draw_board(self.screen, self.background)
             pygame.display.flip()
 
     def update_score(self):
