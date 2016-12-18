@@ -59,7 +59,7 @@ class KeyboardPlayer(pygame.sprite.Sprite):
                 # should change which keys used above based on keyboard location and what they do
 
 
-        # untested if this actually moves keyboard player
+        # moves player, but only once per key press 
         if self.game.movement_allowed(self.player_num, [x_dir, y_dir]):
             delta_x = x_dir * self.standard_movement
             delta_y = y_dir * self.standard_movement
